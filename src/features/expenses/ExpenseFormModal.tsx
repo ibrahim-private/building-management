@@ -63,7 +63,7 @@ export function ExpenseFormModal({ open, onClose, expense }: Props) {
   // The expense's date decides the period automatically when exactly one matches.
   useEffect(() => {
     if (resolution?.kind === 'single') setValue('periodId', resolution.period.id);
-    else if (resolution && resolution.kind !== 'single' && periodId && !periods?.some((p) => p.id === periodId)) {
+    else if (resolution && periodId && !periods?.some((p) => p.id === periodId)) {
       setValue('periodId', '');
     }
   }, [resolution, periods, periodId, setValue]);
