@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ tokens
+   Colors are stored as "r g b" triplets so Tailwind can apply opacity.
+   Light = off-white app, white cards, slate text. Dark flips the surfaces. */
+:root {
+  --app: 246 248 247;
+  --card: 255 255 255;
+  --soft: 241 245 244;
+  --ink: 15 23 42;
+  --muted: 100 116 139;
+  --line: 226 232 240;
+
+  --success-bg: 220 252 231;
+  --success-fg: 21 128 61;
+  --warn-bg: 254 243 199;
+  --warn-fg: 180 83 9;
+  --danger-bg: 254 226 226;
+  --danger-fg: 185 28 28;
+  --danger-solid: 220 38 38;
+
+  /* primary: emerald by default */
+  --p-600: 5 150 105;
+  --p-700: 4 120 87;
+  --p-800: 6 95 70;
+  --p-soft: 209 250 229;
+  --p-ink: 4 120 87;
+}
+
+:root.dark {
+  --app: 11 15 20;
+  --card: 20 27 34;
+  --soft: 28 37 46;
+  --ink: 226 232 240;
+  --muted: 148 163 184;
+  --line: 40 52 62;
+
+  --success-bg: 20 60 40;
+  --success-fg: 134 239 172;
+  --warn-bg: 66 45 12;
+  --warn-fg: 252 211 77;
+  --danger-bg: 72 26 26;
+  --danger-fg: 252 165 165;
+  --danger-solid: 239 68 68;
+}
+
+/* Primary colour presets (Settings > Appearance) */
+:root[data-primary='teal'] { --p-600: 13 148 136; --p-700: 15 118 110; --p-800: 17 94 89; --p-soft: 204 251 241; --p-ink: 15 118 110; }
+:root[data-primary='blue'] { --p-600: 37 99 235; --p-700: 29 78 216; --p-800: 30 64 175; --p-soft: 219 234 254; --p-ink: 29 78 216; }
+:root[data-primary='violet'] { --p-600: 124 58 237; --p-700: 109 40 217; --p-800: 91 33 182; --p-soft: 237 233 254; --p-ink: 109 40 217; }
+
+:root.dark[data-primary] { --p-soft: 30 48 44; --p-ink: 110 231 183; }
+:root.dark[data-primary='teal'] { --p-soft: 22 52 52; --p-ink: 94 234 212; }
+:root.dark[data-primary='blue'] { --p-soft: 26 38 66; --p-ink: 147 197 253; }
+:root.dark[data-primary='violet'] { --p-soft: 40 32 66; --p-ink: 196 181 253; }
+:root.dark:not([data-primary]) { --p-soft: 20 52 40; --p-ink: 110 231 183; }
+
+/* -------------------------------------------------------------------- base */
+html {
+  font-family: 'IBM Plex Sans Arabic', Tahoma, system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  color-scheme: light;
+}
+html.dark { color-scheme: dark; }
+
+body {
+  margin: 0;
+  background: rgb(var(--app));
+  color: rgb(var(--ink));
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep Latin numbers/dates stable inside RTL text */
+bdi, .num { unicode-bidi: isolate; }
+
+:focus-visible {
+  outline: 3px solid rgb(var(--p-600) / 0.45);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+button, [role='button'] { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+::selection { background: rgb(var(--p-600) / 0.25); }
+
+@layer components {
+  .page-container { @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8; }
+  .card { @apply rounded-2xl border border-line bg-card shadow-card; }
+  .input-base {
+    @apply w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-base text-ink
+      placeholder:text-muted/70 transition-colors
+      focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30
+      disabled:cursor-not-allowed disabled:bg-soft disabled:text-muted;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Dialog animation (subtle) */
+@keyframes bm-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes bm-pop { from { opacity: 0; transform: translate(-50%, -48%) scale(0.98) } to { opacity: 1; transform: translate(-50%, -50%) scale(1) } }
+.bm-overlay { animation: bm-fade 120ms ease-out; }
+.bm-dialog { animation: bm-pop 140ms ease-out; }
+
+/* Safe area for the mobile bottom bar */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
