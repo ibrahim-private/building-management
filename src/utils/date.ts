@@ -3,7 +3,7 @@
  * compared as plain strings and never shift because of time zones.
  */
 
-const MONTHS_AR = [
+export const MONTHS_AR = [
   'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
   'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
 ];
@@ -87,4 +87,9 @@ export function suggestPeriodName(start: string, end: string): string {
 /** "9 نوفمبر 2026 - 14:05" for report footers. */
 export function formatDateTime(d: Date = new Date()): string {
   return `${formatDate(toISODate(d))} - ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** "2026/12/31" (used on the printed sheet). */
+export function formatDateSlash(iso: string): string {
+  return iso.replaceAll('-', '/');
 }

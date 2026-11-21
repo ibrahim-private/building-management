@@ -1,4 +1,4 @@
-import { unitFullLabel } from '@/constants/labels';
+import { unitLabel } from '@/constants/labels';
 import { repos } from '@/database/repositories';
 import { runInTransaction } from '@/database/unitOfWork';
 import type { Obligation, Transaction } from '@/types';
@@ -43,7 +43,7 @@ export function recordCollection(obligationId: string, paidAt: string): Promise<
       type: 'collection',
       amount: obligation.amount,
       date: paidAt,
-      description: `تحصيل ${unitFullLabel(unit)} - ${period.name}`,
+      description: `تحصيل ${unitLabel(unit)} - ${period.name}`,
       unitId: unit.id,
       obligationId: obligation.id,
       periodId: period.id,

@@ -13,7 +13,11 @@ import { completeSetup } from '@/services/settings/setupService';
 import { todayISO } from '@/utils/date';
 import { dateInput, moneyToMinor, nonNegativeMoneyInput } from '@/utils/validation';
 
-const schema = z.object({ balance: nonNegativeMoneyInput, date: dateInput });
+const schema = z.object({
+  buildingName: z.string().trim().max(60, 'الاسم طويل جداً'),
+  balance: nonNegativeMoneyInput,
+  date: dateInput,
+});
 type FormValues = z.infer<typeof schema>;
 
 /** First launch: record the treasury's existing balance as the opening transaction. */
@@ -27,14 +31,14 @@ export function SetupPage() {
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { balance: '', date: todayISO() },
+    defaultValues: { buildingName: '', balance: '', date: todayISO() },
   });
 
   if (!settings) return <LoadingState />;
   if (settings.setupCompleted) return <Navigate to="/" replace />;
 
   const onSubmit = handleSubmit(async (values) => {
-    const result = await run(() => completeSetup(moneyToMinor(values.balance), values.date), 'تم إعداد التطبيق بنجاح');
+    const result = await run(() => completeSetup(moneyToMinor(values.balance), values.date, values.buildingName), 'تم إعداد التطبيق بنجاح');
     if (result.ok) navigate('/', { replace: true });
   });
 
@@ -52,6 +56,13 @@ export function SetupPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <TextField
+            label="اسم أو رقم العمارة"
+            placeholder="مثال: 46"
+            hint="يُطبع في عنوان كشف الاشتراكات (ايرادات العمارة ...). يمكنك تغييره لاحقاً من الإعدادات."
+            error={errors.buildingName?.message}
+            {...register('buildingName')}
+          />
           <MoneyField
             label="رصيد الخزينة الحالي"
             required

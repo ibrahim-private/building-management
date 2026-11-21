@@ -43,7 +43,7 @@ export function UnitDetailPage() {
         title={unitLabel(unit)}
         description={
           <span className="flex flex-wrap items-center gap-2">
-            {UNIT_TYPE_LABEL[unit.type]} · {unit.name || 'بدون اسم'}
+            {UNIT_TYPE_LABEL[unit.type]}
             {unit.status === 'archived' && <ArchivedBadge />}
           </span>
         }
@@ -75,7 +75,37 @@ export function UnitDetailPage() {
         {rows.length === 0 ? (
           <EmptyState title="لا توجد سجلات بعد" description="ستظهر هنا الفترات التي كانت فيها هذه الوحدة نشطة." />
         ) : (
-          <TableWrap>
+          <>
+          <ul className="space-y-2 sm:hidden">
+            {rows.map(({ period, obligation }) => (
+              <li key={obligation.id} className="rounded-xl border border-line p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <Link to={`/records/${period.id}`} className="font-bold text-ink hover:text-primary">
+                      {period.name}
+                    </Link>
+                    <p className="num text-xs text-muted">{formatDateRange(period.startDate, period.endDate)}</p>
+                  </div>
+                  <PaymentBadge status={obligation.status} />
+                </div>
+                <div className="mt-2 flex items-center justify-between text-sm">
+                  <Money value={obligation.amount} />
+                  {obligation.paidAt && (
+                    <span className="text-xs text-muted">
+                      دُفع في <bdi className="num">{formatDateShort(obligation.paidAt)}</bdi>
+                    </span>
+                  )}
+                </div>
+                {obligation.periodNote && (
+                  <p className="mt-2 rounded-lg bg-warn-bg px-3 py-1.5 text-xs text-warn-fg">{obligation.periodNote}</p>
+                )}
+                <Button size="sm" variant="secondary" className="mt-3 w-full" onClick={() => setEditingObligation(obligation)}>
+                  تعديل
+                </Button>
+              </li>
+            ))}
+          </ul>
+          <TableWrap className="hidden sm:block">
             <table className="w-full min-w-[640px]">
               <thead>
                 <tr>
@@ -111,6 +141,7 @@ export function UnitDetailPage() {
               </tbody>
             </table>
           </TableWrap>
+          </>
         )}
       </SectionCard>
 

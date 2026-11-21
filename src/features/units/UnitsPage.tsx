@@ -55,7 +55,7 @@ export function UnitsPage() {
         if (filter === 'paid' && obligation?.status !== 'paid') return false;
       }
       if (!q) return true;
-      return unit.number.toLowerCase().includes(q) || unit.name.toLowerCase().includes(q);
+      return unit.number.toLowerCase().includes(q);
     });
   }, [overview, filter, search]);
 
@@ -121,7 +121,7 @@ export function UnitsPage() {
           className="lg:w-80"
           value={search}
           onValueChange={setSearch}
-          placeholder="ابحث برقم الوحدة أو الاسم"
+          placeholder="ابحث برقم الوحدة"
         />
       </div>
 
@@ -187,7 +187,7 @@ export function UnitsPage() {
           paying?.obligation && (
             <>
               هل استلمت <b>{formatMoney(paying.obligation.amount)}</b> من <b>{unitLabel(paying.unit)}</b>
-              {paying.unit.name ? ` (${paying.unit.name})` : ''}؟ سيُضاف المبلغ إلى الخزينة مباشرة.
+              ؟ سيُضاف المبلغ إلى الخزينة مباشرة.
             </>
           )
         }

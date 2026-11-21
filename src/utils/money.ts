@@ -55,3 +55,12 @@ export function formatMoney(minor: number): string {
 export function sumMinor(values: readonly number[]): number {
   return values.reduce((total, v) => total + v, 0);
 }
+
+/** Piastres -> "27540" / "27540.5" (no thousands separator, as written on the paper sheet). */
+export function formatPlain(minor: number): string {
+  const sign = minor < 0 ? '-' : '';
+  const abs = Math.abs(minor);
+  const major = Math.trunc(abs / MINOR_PER_MAJOR);
+  const frac = abs % MINOR_PER_MAJOR;
+  return `${sign}${major}${frac ? `.${String(frac).padStart(2, '0').replace(/0$/, '')}` : ''}`;
+}

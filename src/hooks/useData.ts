@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getSettings } from '@/services/settings/settingsService';
+import { getSubscriptionSheet } from '@/services/reports/subscriptionSheet';
 import { resolvePeriodForDate } from '@/services/period/periodResolution';
 import { getPeriodDraft } from '@/services/period/periodService';
 import {
@@ -35,3 +36,6 @@ export const usePeriodDraft = () => useLiveQuery(() => getPeriodDraft(), []);
 /** Which period(s) contain this date (for the expense form). */
 export const usePeriodResolution = (date: string) =>
   useLiveQuery(() => resolvePeriodForDate(date), [date]);
+
+export const useSubscriptionSheet = (periodId: string) =>
+  useLiveQuery(async () => (await getSubscriptionSheet(periodId)) ?? null, [periodId]);

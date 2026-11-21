@@ -22,8 +22,8 @@ async function reset() {
 
 async function seed() {
   await completeSetup(100000, '2026-09-01'); // 1,000.00
-  const apt1 = await createUnit({ type: 'apartment', number: '1', name: 'أحمد', notes: '' });
-  const shop = await createUnit({ type: 'facility', number: '1', name: 'صيدلية', notes: '' });
+  const apt1 = await createUnit({ type: 'apartment', number: '1', notes: '' });
+  const shop = await createUnit({ type: 'facility', number: '1', notes: '' });
   const period = await createPeriod({
     name: 'سبتمبر – أكتوبر 2026',
     startDate: '2026-09-01',
@@ -186,8 +186,8 @@ describe('units', () => {
 
   it('rejects a duplicate number within the same type but allows it across types', async () => {
     await seed();
-    await expect(createUnit({ type: 'apartment', number: '1', name: '', notes: '' })).rejects.toMatchObject({ code: 'DUPLICATE' });
-    await expect(createUnit({ type: 'facility', number: '2', name: '', notes: '' })).resolves.toBeTruthy();
+    await expect(createUnit({ type: 'apartment', number: '1', notes: '' })).rejects.toMatchObject({ code: 'DUPLICATE' });
+    await expect(createUnit({ type: 'facility', number: '2', notes: '' })).resolves.toBeTruthy();
   });
 });
 

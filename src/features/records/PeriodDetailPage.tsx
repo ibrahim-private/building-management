@@ -1,8 +1,7 @@
-import { ArrowRight, CircleDollarSign, Undo2 } from 'lucide-react';
+import { ArrowRight, CircleDollarSign, Printer, Undo2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DatePromptDialog } from '@/components/shared/DatePromptDialog';
-import { ExportPdfButton } from '@/components/shared/ExportPdfButton';
 import { TransactionItem } from '@/components/shared/TransactionItem';
 import { ArchivedBadge, PaymentBadge, PeriodBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -10,11 +9,10 @@ import { Card, SectionCard } from '@/components/ui/Card';
 import { useConfirm } from '@/components/ui/ConfirmProvider';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/feedback';
 import { Money, PageHeader, ProgressBar, SearchInput, SegmentedControl, TableWrap, tdClass, thClass } from '@/components/ui/misc';
-import { unitFullLabel, unitLabel } from '@/constants/labels';
+import { unitLabel } from '@/constants/labels';
 import { useAction } from '@/hooks/useAction';
 import { usePeriodDetail } from '@/hooks/useData';
 import { recordCollection, undoCollection } from '@/services/finance/collectionService';
-import { exportFinancialPeriodPdf, exportPeriodCollectionPdf } from '@/services/pdf/exportReports';
 import type { UnitCollectionRow } from '@/types';
 import { formatDateRange, formatDateShort } from '@/utils/date';
 import { formatMoney } from '@/utils/money';
@@ -40,7 +38,7 @@ export function PeriodDetailPage() {
     const q = search.trim().toLowerCase();
     return (detail?.rows ?? []).filter(({ unit, obligation }) => {
       if (status !== 'all' && obligation.status !== status) return false;
-      return !q || unit.number.toLowerCase().includes(q) || unit.name.toLowerCase().includes(q);
+      return !q || unit.number.toLowerCase().includes(q);
     });
   }, [detail, status, search]);
 
@@ -102,10 +100,13 @@ export function PeriodDetailPage() {
           </span>
         }
         actions={
-          <>
-            <ExportPdfButton label="كشف التحصيل PDF" onExport={() => exportPeriodCollectionPdf(period.id)} />
-            <ExportPdfButton label="التقرير المالي PDF" variant="soft" onExport={() => exportFinancialPeriodPdf(period.id)} />
-          </>
+          <Link
+            to={`/records/${period.id}/print`}
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 text-base font-semibold text-white shadow-sm hover:bg-primary-hover"
+          >
+            <Printer className="h-5 w-5" aria-hidden />
+            معاينة وطباعة الكشف
+          </Link>
         }
       />
 
@@ -140,8 +141,8 @@ export function PeriodDetailPage() {
         value={tab}
         onChange={switchTab}
         options={[
-          { value: 'units', label: 'سجل الوحدات', count: detail.rows.length },
-          { value: 'collections', label: 'حركات التحصيل', count: detail.collectionTransactions.length },
+          { value: 'units', label: 'الوحدات', count: detail.rows.length },
+          { value: 'collections', label: 'التحصيل', count: detail.collectionTransactions.length },
           { value: 'expenses', label: 'المصروفات', count: detail.expenses.length },
         ]}
       />
@@ -163,13 +164,18 @@ export function PeriodDetailPage() {
           className="lg:w-72"
           value={search}
           onValueChange={setSearch}
-          placeholder={tab === 'units' ? 'ابحث برقم الوحدة أو الاسم' : tab === 'expenses' ? 'ابحث في المصروفات' : 'ابحث في البيان'}
+          placeholder={tab === 'units' ? 'ابحث برقم الوحدة' : tab === 'expenses' ? 'ابحث في المصروفات' : 'ابحث في البيان'}
         />
         {tab !== 'units' && (
-          <div className="flex items-center gap-2">
-            <input type="date" aria-label="من تاريخ" className="input-base" value={from} onChange={(e) => setFrom(e.target.value)} />
-            <span className="text-muted">إلى</span>
-            <input type="date" aria-label="إلى تاريخ" className="input-base" value={to} onChange={(e) => setTo(e.target.value)} />
+          <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
+            <label className="min-w-0 space-y-1 text-xs font-semibold text-muted">
+              من تاريخ
+              <input type="date" className="input-base min-w-0 text-ink" value={from} onChange={(e) => setFrom(e.target.value)} />
+            </label>
+            <label className="min-w-0 space-y-1 text-xs font-semibold text-muted">
+              إلى تاريخ
+              <input type="date" className="input-base min-w-0 text-ink" value={to} onChange={(e) => setTo(e.target.value)} />
+            </label>
           </div>
         )}
       </div>
@@ -180,12 +186,44 @@ export function PeriodDetailPage() {
           {rows.length === 0 ? (
             <EmptyState title="لا توجد وحدات مطابقة" />
           ) : (
-            <TableWrap>
+            <>
+            <ul className="space-y-2 sm:hidden">
+              {rows.map((row) => (
+                <li key={row.obligation.id} className="rounded-xl border border-line p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <Link to={`/units/${row.unit.id}`} className="font-bold text-ink hover:text-primary">
+                        {unitLabel(row.unit)}
+                      </Link>
+                    </div>
+                    <PaymentBadge status={row.obligation.status} />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2 text-sm">
+                    <Money value={row.obligation.amount} />
+                    {row.obligation.paidAt && (
+                      <span className="text-xs text-muted">
+                        دُفع في <bdi className="num">{formatDateShort(row.obligation.paidAt)}</bdi>
+                      </span>
+                    )}
+                    {row.unit.status === 'archived' && <ArchivedBadge />}
+                  </div>
+                  {row.obligation.status === 'unpaid' ? (
+                    <Button size="sm" className="mt-3 w-full" icon={<CircleDollarSign className="h-4 w-4" />} onClick={() => setPaying(row)}>
+                      تسجيل الدفع
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="secondary" className="mt-3 w-full" icon={<Undo2 className="h-4 w-4" />} onClick={() => void handleUndo(row)}>
+                      تراجع عن الدفع
+                    </Button>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <TableWrap className="hidden sm:block">
               <table className="w-full min-w-[640px]">
                 <thead>
                   <tr>
                     <th className={thClass}>الوحدة</th>
-                    <th className={thClass}>الاسم</th>
                     <th className={thClass}>المطلوب</th>
                     <th className={thClass}>الحالة</th>
                     <th className={thClass}>تاريخ الدفع</th>
@@ -201,7 +239,6 @@ export function PeriodDetailPage() {
                         </Link>{' '}
                         {row.unit.status === 'archived' && <ArchivedBadge />}
                       </td>
-                      <td className={tdClass}>{row.unit.name || <span className="text-muted">—</span>}</td>
                       <td className={tdClass}><Money value={row.obligation.amount} /></td>
                       <td className={tdClass}><PaymentBadge status={row.obligation.status} /></td>
                       <td className={tdClass}><bdi className="num">{formatDateShort(row.obligation.paidAt)}</bdi></td>
@@ -221,6 +258,7 @@ export function PeriodDetailPage() {
                 </tbody>
               </table>
             </TableWrap>
+            </>
           )}
         </SectionCard>
       )}
@@ -254,7 +292,23 @@ export function PeriodDetailPage() {
           {expenses.length === 0 ? (
             <EmptyState title="لا توجد مصروفات مطابقة" />
           ) : (
-            <TableWrap>
+            <>
+            <ul className="space-y-2 sm:hidden">
+              {expenses.map((e) => (
+                <li key={e.id} className={`rounded-xl border border-line p-3 ${e.status === 'unpaid' ? 'bg-warn-bg/30' : ''}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="min-w-0 font-bold text-ink">{e.title}</p>
+                    <PaymentBadge status={e.status} />
+                  </div>
+                  {e.notes && <p className="mt-1 text-xs text-muted">{e.notes}</p>}
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <Money value={e.amount} />
+                    <bdi className="num text-xs text-muted">{formatDateShort(e.date)}</bdi>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <TableWrap className="hidden sm:block">
               <table className="w-full min-w-[520px]">
                 <thead>
                   <tr>
@@ -279,6 +333,7 @@ export function PeriodDetailPage() {
                 </tbody>
               </table>
             </TableWrap>
+            </>
           )}
         </SectionCard>
       )}
@@ -291,7 +346,7 @@ export function PeriodDetailPage() {
         description={
           paying && (
             <>
-              هل استلمت <b>{formatMoney(paying.obligation.amount)}</b> من <b>{unitFullLabel(paying.unit)}</b> عن "{period.name}"؟
+              هل استلمت <b>{formatMoney(paying.obligation.amount)}</b> من <b>{unitLabel(paying.unit)}</b> عن "{period.name}"؟
               سيُضاف المبلغ إلى الخزينة.
             </>
           )

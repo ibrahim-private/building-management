@@ -4,7 +4,7 @@ import { ArchivedBadge, PaymentBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Money } from '@/components/ui/misc';
-import { unitLabel } from '@/constants/labels';
+import { UNIT_TYPE_LABEL, unitLabel } from '@/constants/labels';
 import type { Obligation, Unit } from '@/types';
 import { cn } from '@/utils/cn';
 import { formatDateShort } from '@/utils/date';
@@ -31,7 +31,7 @@ export function UnitCard({ unit, obligation, hasActivePeriod, onPay, onUndo, onE
           <Link to={`/units/${unit.id}`} className="text-lg font-bold text-ink hover:text-primary">
             {unitLabel(unit)}
           </Link>
-          <p className="truncate text-sm text-muted">{unit.name || 'بدون اسم'}</p>
+          <p className="text-sm text-muted">{UNIT_TYPE_LABEL[unit.type]}</p>
         </div>
         {archived ? <ArchivedBadge /> : obligation ? <PaymentBadge status={obligation.status} /> : null}
       </div>

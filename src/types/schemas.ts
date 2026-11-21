@@ -22,7 +22,6 @@ export const unitSchema = z.object({
   id: idSchema,
   type: unitTypeSchema,
   number: z.string().min(1),
-  name: z.string(),
   notes: z.string(),
   status: z.enum(['active', 'archived']),
   createdAt: timestampSchema,
@@ -85,6 +84,8 @@ export const transactionSchema = z.object({
 
 export const appSettingsSchema = z.object({
   setupCompleted: z.boolean(),
+  /** Printed in the title of the subscriptions sheet (e.g. building number or name). */
+  buildingName: z.string().default(''),
   theme: z.enum(['light', 'dark']),
   primaryColor: z.enum(['emerald', 'teal', 'blue', 'violet']),
   defaultDurationDays: z.number().int().min(1).max(366),

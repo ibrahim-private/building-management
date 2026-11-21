@@ -37,7 +37,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="التنقل الرئيسي"
-      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card shadow-nav lg:hidden"
+      className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card shadow-nav lg:hidden print:!hidden"
     >
       <div className="mx-auto flex max-w-lg items-end">
         {LEFT_OF_CENTER.map((item) => (

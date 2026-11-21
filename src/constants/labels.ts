@@ -46,8 +46,3 @@ export const TRANSACTION_DIRECTION: Record<TransactionType, 'in' | 'out'> = {
 export function unitLabel(unit: Pick<Unit, 'type' | 'number'>): string {
   return `${UNIT_TYPE_SHORT[unit.type]} ${unit.number}`;
 }
-
-/** "شقة 3 - أحمد علي" (name omitted when empty) */
-export function unitFullLabel(unit: Pick<Unit, 'type' | 'number' | 'name'>): string {
-  return unit.name.trim() ? `${unitLabel(unit)} - ${unit.name.trim()}` : unitLabel(unit);
-}

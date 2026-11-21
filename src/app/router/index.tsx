@@ -5,6 +5,7 @@ import { ExpensesPage } from '@/features/expenses/ExpensesPage';
 import { PeriodsPage } from '@/features/periods/PeriodsPage';
 import { RecordsPage } from '@/features/records/RecordsPage';
 import { PeriodDetailPage } from '@/features/records/PeriodDetailPage';
+import { PeriodPrintPage } from '@/features/records/print/PeriodPrintPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { SetupPage } from '@/features/setup/SetupPage';
 import { TreasuryPage } from '@/features/treasury/TreasuryPage';
@@ -24,6 +25,7 @@ export const router = createBrowserRouter(
         { path: 'treasury', element: <TreasuryPage /> },
         { path: 'records', element: <RecordsPage /> },
         { path: 'records/:periodId', element: <PeriodDetailPage /> },
+        { path: 'records/:periodId/print', element: <PeriodPrintPage /> },
         { path: 'periods', element: <PeriodsPage /> },
         { path: 'settings', element: <SettingsPage /> },
         { path: '*', element: <Navigate to="/" replace /> },

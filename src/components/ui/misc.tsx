@@ -45,7 +45,7 @@ export function PageHeader({
         <h1 className="text-2xl font-bold text-ink sm:text-3xl">{title}</h1>
         {description && <div className="mt-1 text-sm text-muted sm:text-base">{description}</div>}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">{actions}</div>}
     </div>
   );
 }
@@ -127,7 +127,14 @@ export function SegmentedControl<T extends string>({
   className?: string;
 }) {
   return (
-    <div role="tablist" className={cn('inline-flex max-w-full overflow-x-auto rounded-xl bg-soft p-1', className)}>
+    <div
+      role="tablist"
+      className={cn(
+        'flex w-full max-w-full overflow-x-auto rounded-xl bg-soft p-1 sm:inline-flex sm:w-auto',
+        '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        className,
+      )}
+    >
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -136,7 +143,7 @@ export function SegmentedControl<T extends string>({
           aria-selected={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
-            'min-h-[38px] whitespace-nowrap rounded-lg px-3.5 text-sm font-semibold transition-colors',
+            'min-h-[38px] flex-1 whitespace-nowrap rounded-lg px-2.5 text-sm font-semibold transition-colors sm:flex-none sm:px-3.5',
             value === opt.value ? 'bg-card text-ink shadow-sm' : 'text-muted hover:text-ink',
           )}
         >
@@ -193,8 +200,8 @@ export function Switch({
 }
 
 /** Responsive table wrapper: scrolls inside the card instead of the page. */
-export function TableWrap({ children }: { children: ReactNode }) {
-  return <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">{children}</div>;
+export function TableWrap({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn('-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0', className)}>{children}</div>;
 }
 
 export const thClass = 'whitespace-nowrap border-b border-line px-3 py-2.5 text-start text-xs font-bold text-muted';

@@ -112,3 +112,16 @@ button:disabled { cursor: not-allowed; }
 
 /* Safe area for the mobile bottom bar */
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ---------------------------------------------------------------- printing */
+@page { size: A4 portrait; margin: 0; }
+
+@media print {
+  html, body { background: #fff !important; }
+  [data-sonner-toaster] { display: none !important; }
+}
+
+/* Editable cells of the printed sheet (preview only; nothing shows in print/PDF) */
+.sheet-editable { outline: none; cursor: text; }
+.sheet-editable:hover { background: #fffbe6; }
+.sheet-editable:focus { background: #fff6c2; }

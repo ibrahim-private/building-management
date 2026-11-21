@@ -11,7 +11,7 @@ const ORDER = ['dashboard', 'units', 'expenses', 'treasury', 'records', 'setting
 export function Sidebar() {
   const { pathname } = useLocation();
   return (
-    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-line bg-card lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-line bg-card lg:flex print:!hidden">
       <div className="flex items-center gap-3 px-5 py-6">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
           <Building className="h-6 w-6" aria-hidden />

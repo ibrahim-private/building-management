@@ -16,10 +16,15 @@ export function SettingsPage() {
   const settings = useSettings();
   const { run } = useAction();
   const [duration, setDuration] = useState('');
+  const [buildingName, setBuildingName] = useState('');
 
   useEffect(() => {
     if (settings) setDuration(String(settings.defaultDurationDays));
   }, [settings?.defaultDurationDays]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (settings) setBuildingName(settings.buildingName);
+  }, [settings?.buildingName]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!settings) return <LoadingState />;
 
@@ -31,6 +36,30 @@ export function SettingsPage() {
   return (
     <div className="space-y-5">
       <PageHeader title="الإعدادات" />
+
+      <SectionCard title="بيانات العمارة">
+        <label htmlFor="building-name" className="mb-1.5 block text-sm font-semibold text-ink">
+          اسم أو رقم العمارة
+        </label>
+        <div className="flex flex-wrap items-start gap-2">
+          <input
+            id="building-name"
+            className="input-base w-full sm:w-72"
+            placeholder="مثال: 46"
+            maxLength={60}
+            value={buildingName}
+            onChange={(e) => setBuildingName(e.target.value)}
+          />
+          <Button
+            variant="secondary"
+            disabled={buildingName.trim() === settings.buildingName}
+            onClick={() => void save({ buildingName: buildingName.trim() }, 'تم حفظ اسم العمارة')}
+          >
+            حفظ
+          </Button>
+        </div>
+        <p className="mt-1 text-sm text-muted">يظهر في عنوان كشف الاشتراكات المطبوع: "ايرادات العمارة ...".</p>
+      </SectionCard>
 
       <SectionCard title="المظهر">
         <div className="space-y-5">

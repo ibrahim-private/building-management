@@ -51,6 +51,10 @@ Replacing IndexedDB later: re-implement `repos` (`database/repositories/index.ts
 
 Most JS PDF libraries cannot shape Arabic correctly. Reports are laid out as HTML/CSS (the browser shapes Arabic and handles RTL with the embedded font), rendered with `html2canvas` and assembled with `jsPDF`. Works offline. Trade-off: PDF text is an image (not selectable). Please check a generated PDF visually (Arabic joining, RTL tables, page numbers, multi-page tables).
 
+## Subscriptions sheet (print / PDF)
+
+Records → a period → "معاينة وطباعة الكشف" opens `/records/:periodId/print`: a classic black-and-white A4 sheet with a black frame (Amiri font, bundled offline). Title = "ايرادات العمارة <building name>" (name set at setup or Settings → بيانات العمارة); subtitle derived from the period. Columns: شقة | selected period | N following empty periods (default 2, adjustable 0–3) | ملاحظات. Apartments first, facilities after the last apartment (PDF only; the app lists facilities first). Every cell, title and footer line is editable in the preview; edits affect only the printed/PDF copy. Footer totals are auto-filled. Units are identified by number only (no resident names).
+
 ## Known decisions / limitations
 
 - Recharts is used for one purposeful chart only (required vs collected per period, Records page, shown with 2+ periods). The dashboard uses a progress bar instead of decorative charts, per the spec.

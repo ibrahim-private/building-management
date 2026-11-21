@@ -10,7 +10,6 @@ import { ensureObligation } from '../period/obligationService';
 export interface UnitInput {
   type: UnitType;
   number: string;
-  name: string;
   notes: string;
 }
 
@@ -36,23 +35,23 @@ async function attachToActivePeriod(unit: Unit): Promise<void> {
   if (active) await ensureObligation(unit, active);
 }
 
-function buildUnit(type: UnitType, number: string, name: string, notes: string): Unit {
+function buildUnit(type: UnitType, number: string, notes: string): Unit {
   const now = nowISO();
-  return { id: newId(), type, number, name: name.trim(), notes: notes.trim(), status: 'active', createdAt: now, updatedAt: now };
+  return { id: newId(), type, number, notes: notes.trim(), status: 'active', createdAt: now, updatedAt: now };
 }
 
 export function createUnit(input: UnitInput): Promise<Unit> {
   return runInTransaction(async () => {
     const number = normalizeNumber(input.number);
     await assertNumberAvailable(input.type, number);
-    const unit = buildUnit(input.type, number, input.name, input.notes);
+    const unit = buildUnit(input.type, number, input.notes);
     await repos.units.add(unit);
     await attachToActivePeriod(unit);
     return unit;
   });
 }
 
-/** Adds `quantity` units numbered firstNumber, firstNumber+1, ... (names can be filled in later). */
+/** Adds `quantity` units numbered firstNumber, firstNumber+1, ... . */
 export function createUnitsBulk(type: UnitType, quantity: number, firstNumber: number): Promise<Unit[]> {
   return runInTransaction(async () => {
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_BULK) {
@@ -65,7 +64,7 @@ export function createUnitsBulk(type: UnitType, quantity: number, firstNumber: n
     for (let i = 0; i < quantity; i += 1) {
       const number = String(firstNumber + i);
       await assertNumberAvailable(type, number);
-      const unit = buildUnit(type, number, '', '');
+      const unit = buildUnit(type, number, '');
       await repos.units.add(unit);
       await attachToActivePeriod(unit);
       created.push(unit);
@@ -81,7 +80,7 @@ export function updateUnit(id: string, input: Omit<UnitInput, 'type'>): Promise<
     if (!unit) throw new AppError('NOT_FOUND', 'هذه الوحدة غير موجودة.');
     const number = normalizeNumber(input.number);
     await assertNumberAvailable(unit.type, number, unit.id);
-    const next: Unit = { ...unit, number, name: input.name.trim(), notes: input.notes.trim(), updatedAt: nowISO() };
+    const next: Unit = { ...unit, number, notes: input.notes.trim(), updatedAt: nowISO() };
     await repos.units.put(next);
     return next;
   });

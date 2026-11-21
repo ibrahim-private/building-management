@@ -14,6 +14,7 @@ export const SETTINGS_KEY = 'app';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   setupCompleted: false,
+  buildingName: '',
   theme: 'light',
   primaryColor: 'emerald',
   defaultDurationDays: 60,
