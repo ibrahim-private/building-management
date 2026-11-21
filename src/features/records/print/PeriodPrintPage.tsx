@@ -1,13 +1,11 @@
-import { ArrowRight, Download, Printer } from 'lucide-react';
+import { ArrowRight, Printer } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { EmptyState, ErrorState, LoadingState, Notice } from '@/components/ui/feedback';
 import { SelectField } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/misc';
-import { useAction } from '@/hooks/useAction';
 import { useSettings, useSubscriptionSheet } from '@/hooks/useData';
-import { renderSheetPdf } from '@/services/pdf/sheetPdf';
 import {
   DEFAULT_FOLLOWING_COLUMNS,
   MAX_FOLLOWING_COLUMNS,
@@ -31,7 +29,6 @@ export function PeriodPrintPage() {
   const { periodId = '' } = useParams();
   const sheet = useSubscriptionSheet(periodId);
   const settings = useSettings();
-  const { run, pending } = useAction();
 
   const [following, setFollowing] = useState(DEFAULT_FOLLOWING_COLUMNS);
   const paperRef = useRef<HTMLDivElement>(null);
@@ -62,14 +59,6 @@ export function PeriodPrintPage() {
   const scale = Math.min(1, boxWidth / PAGE_W);
   const totalHeight = pages.length * (PAGE_H + PAGE_GAP);
 
-  const downloadPdf = () =>
-    run(async () => {
-      const els: HTMLElement[] = paperRef.current
-        ? Array.from(paperRef.current.querySelectorAll<HTMLElement>('[data-sheet-page]'))
-        : [];
-      await renderSheetPdf(els, `subscriptions-${period.startDate}.pdf`);
-    }, 'تم تجهيز ملف PDF وبدأ تنزيله');
-
   return (
     <div className="space-y-5">
       <div className="space-y-5 print:hidden">
@@ -83,16 +72,11 @@ export function PeriodPrintPage() {
 
         <PageHeader
           title="معاينة كشف الاشتراكات"
-          description="الأرقام جاهزة. اضغط على أي خانة واكتب ملاحظاتك، ثم نزّل الملف أو اطبعه."
+          description="الأرقام جاهزة. اضغط على أي خانة واكتب ملاحظاتك، ثم اضغط زر الطباعة / حفظ PDF."
           actions={
-            <>
-              <Button icon={<Download className="h-5 w-5" />} loading={pending} onClick={() => void downloadPdf()}>
-                تنزيل PDF
-              </Button>
-              <Button variant="secondary" icon={<Printer className="h-5 w-5" />} onClick={() => window.print()}>
-                طباعة
-              </Button>
-            </>
+            <Button icon={<Printer className="h-5 w-5" />} onClick={() => window.print()}>
+              طباعة / حفظ PDF
+            </Button>
           }
         />
 
@@ -105,6 +89,10 @@ export function PeriodPrintPage() {
             ليظهر تلقائياً، أو عدّله مباشرة على الورقة أدناه.
           </Notice>
         )}
+
+        <Notice tone="info" title="لحفظ الملف PDF">
+          اضغط "طباعة / حفظ PDF" ثم اختر الوجهة "Save as PDF" (حفظ بصيغة PDF)، وأوقف "Headers and footers". الملف بيطلع بخط عربي سليم ونص قابل للتحديد.
+        </Notice>
 
         <Notice tone="info">
           ما تكتبه هنا يظهر في الملف المطبوع فقط ولا يغيّر بيانات التطبيق. على الهاتف يمكنك تكبير الورقة بإصبعين لتسهيل الكتابة.
@@ -141,7 +129,7 @@ export function PeriodPrintPage() {
               {pages.map((rows, i) => (
                 <div
                   key={i}
-                  className="mb-6 bg-white shadow-card print:mb-0 print:break-after-page print:shadow-none print:last:break-after-auto"
+                  className="mb-6 bg-white shadow-card print:mb-0 print:!h-[1120px] print:overflow-hidden print:break-after-page print:shadow-none print:last:break-after-auto"
                   style={{ width: PAGE_W, height: PAGE_H }}
                 >
                   <SheetPage
